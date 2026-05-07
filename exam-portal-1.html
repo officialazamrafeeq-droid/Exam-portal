@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Software Testing &amp; Development — Onboarding Exam</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+:root{--bg:#0a0e1a;--card:#111827;--border:#1e2d40;--accent:#00d4ff;--accent2:#7c3aed;--success:#10b981;--danger:#ef4444;--warn:#f59e0b;--text:#e2e8f0;--muted:#64748b;--mono:'Space Mono',monospace;--sans:'DM Sans',sans-serif;}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:100vh;}
+#loginScreen{min-height:100vh;display:flex;align-items:center;justify-content:center;background:radial-gradient(ellipse at 60% 30%,#0e1f3a 0%,var(--bg) 70%);}
+.login-box{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:48px 40px;width:420px;box-shadow:0 0 80px rgba(0,212,255,0.07);}
+.login-badge{display:inline-block;font-family:var(--mono);font-size:11px;letter-spacing:3px;color:var(--accent);border:1px solid var(--accent);border-radius:4px;padding:4px 10px;margin-bottom:20px;text-transform:uppercase;}
+.login-box h1{font-size:26px;font-weight:700;margin-bottom:6px;}
+.login-box p{color:var(--muted);font-size:14px;margin-bottom:32px;}
+.field{margin-bottom:20px;}
+.field label{display:block;font-size:12px;font-weight:600;letter-spacing:1px;color:var(--muted);text-transform:uppercase;margin-bottom:8px;}
+.field input{width:100%;background:#0a0e1a;border:1px solid var(--border);border-radius:8px;padding:12px 16px;color:var(--text);font-family:var(--sans);font-size:15px;outline:none;transition:border 0.2s;}
+.field input:focus{border-color:var(--accent);}
+.btn-primary{width:100%;background:linear-gradient(135deg,var(--accent2),var(--accent));color:#fff;border:none;border-radius:8px;padding:14px;font-size:15px;font-weight:600;cursor:pointer;font-family:var(--sans);}
+.login-err{color:var(--danger);font-size:13px;margin-top:10px;text-align:center;display:none;}
+.admin-link{margin-top:24px;text-align:center;font-size:12px;color:var(--muted);}
+.admin-link span{color:var(--accent);cursor:pointer;text-decoration:underline;}
+#examScreen{display:none;}
+.exam-header{position:sticky;top:0;z-index:100;background:rgba(10,14,26,0.95);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:14px 32px;display:flex;align-items:center;justify-content:space-between;}
+.exam-title{font-family:var(--mono);font-size:12px;color:var(--accent);letter-spacing:2px;}
+.timer-wrap{display:flex;align-items:center;gap:8px;}
+.timer-label{font-size:12px;color:var(--muted);}
+#timerDisplay{font-family:var(--mono);font-size:22px;font-weight:700;color:var(--accent);letter-spacing:2px;}
+#timerDisplay.warn{color:var(--warn);}
+#timerDisplay.danger{color:var(--danger);animation:pulse 0.8s infinite;}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.5}}
+.progress-bar-wrap{height:3px;background:var(--border);}
+.progress-bar-fill{height:100%;background:linear-gradient(90deg,var(--accent2),var(--accent));transition:width 0.3s;width:0%;}
+.exam-body{max-width:860px;margin:0 auto;padding:40px 24px 40px;}
+.section-title{font-family:var(--mono);font-size:11px;letter-spacing:3px;color:var(--accent2);text-transform:uppercase;margin:40px 0 20px;padding-bottom:10px;border-bottom:1px solid var(--border);}
+.q-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:24px 28px;margin-bottom:16px;}
+.q-num{font-family:var(--mono);font-size:11px;color:var(--muted);margin-bottom:10px;}
+.q-text{font-size:15px;font-weight:500;line-height:1.6;margin-bottom:18px;}
+.q-scenario{background:#0a0e1a;border-left:3px solid var(--accent2);border-radius:6px;padding:14px 16px;margin-bottom:18px;font-size:13px;color:#94a3b8;line-height:1.7;font-style:italic;}
+.options{display:flex;flex-direction:column;gap:10px;}
+.opt-label{display:flex;align-items:flex-start;gap:12px;padding:12px 16px;border:1px solid var(--border);border-radius:8px;cursor:pointer;font-size:14px;line-height:1.5;}
+.opt-label:hover{border-color:var(--accent);background:rgba(0,212,255,0.04);}
+.opt-label.selected{border-color:var(--accent2);background:rgba(124,58,237,0.1);}
+.opt-key{font-family:var(--mono);font-size:12px;color:var(--accent);min-width:20px;font-weight:700;margin-top:1px;}
+.submit-wrap{text-align:center;margin-top:32px;padding-bottom:60px;}
+.btn-submit{background:linear-gradient(135deg,#7c3aed,#00d4ff);color:#fff;border:none;border-radius:10px;padding:16px 56px;font-size:16px;font-weight:700;cursor:pointer;font-family:var(--sans);}
+.unanswered-warn{color:var(--warn);font-size:13px;margin-top:12px;display:none;}
+#submittedScreen{display:none;min-height:100vh;align-items:center;justify-content:center;flex-direction:column;text-align:center;padding:40px;background:radial-gradient(ellipse at 40% 60%,#0e1f3a 0%,var(--bg) 70%);}
+.submitted-icon{font-size:64px;margin-bottom:24px;}
+.submitted-title{font-size:28px;font-weight:700;margin-bottom:10px;}
+.submitted-sub{color:var(--muted);font-size:15px;line-height:1.7;max-width:440px;}
+#adminScreen{display:none;min-height:100vh;background:radial-gradient(ellipse at 80% 20%,#1a0e30 0%,var(--bg) 60%);}
+.admin-header{background:rgba(10,14,26,0.95);border-bottom:1px solid var(--border);padding:16px 32px;display:flex;align-items:center;justify-content:space-between;}
+.admin-title{font-family:var(--mono);font-size:14px;color:var(--accent2);letter-spacing:2px;}
+.admin-badge{font-size:11px;color:var(--muted);font-family:var(--mono);}
+.admin-body{max-width:1100px;margin:0 auto;padding:40px 24px;}
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-bottom:40px;}
+.stat-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:24px;}
+.stat-label{font-size:12px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-bottom:8px;}
+.stat-val{font-family:var(--mono);font-size:28px;font-weight:700;color:var(--accent);}
+.stat-sub{font-size:12px;color:var(--muted);margin-top:4px;}
+.results-title{font-family:var(--mono);font-size:12px;letter-spacing:2px;color:var(--accent2);text-transform:uppercase;margin-bottom:16px;}
+.result-row{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px 20px;margin-bottom:12px;}
+.result-grid{display:grid;grid-template-columns:2fr 1fr 1.2fr 1.2fr 1fr 80px;gap:12px;align-items:center;}
+.result-row.hdr{background:transparent;border-color:transparent;font-size:11px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;font-family:var(--mono);}
+.result-name{font-weight:600;font-size:15px;}
+.result-detail{font-size:12px;color:var(--muted);}
+.score-pill{display:inline-block;font-family:var(--mono);font-size:12px;font-weight:700;padding:4px 10px;border-radius:20px;}
+.sp{background:rgba(16,185,129,0.15);color:var(--success);border:1px solid rgba(16,185,129,0.3);}
+.sf{background:rgba(239,68,68,0.15);color:var(--danger);border:1px solid rgba(239,68,68,0.3);}
+.sa{background:rgba(245,158,11,0.15);color:var(--warn);border:1px solid rgba(245,158,11,0.3);}
+.no-res{text-align:center;color:var(--muted);font-size:14px;padding:60px;}
+.btn-detail{background:transparent;border:1px solid var(--border);color:var(--muted);border-radius:6px;padding:6px 12px;font-size:12px;cursor:pointer;font-family:var(--sans);}
+.btn-detail:hover{border-color:var(--accent);color:var(--accent);}
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:999;align-items:center;justify-content:center;}
+.modal-overlay.open{display:flex;}
+.modal{background:var(--card);border:1px solid var(--border);border-radius:16px;width:90%;max-width:700px;max-height:85vh;overflow-y:auto;padding:32px;}
+.modal-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;}
+.modal-close{background:none;border:none;color:var(--muted);font-size:24px;cursor:pointer;line-height:1;}
+.mq{border-bottom:1px solid var(--border);padding-bottom:14px;margin-bottom:14px;}
+.mq-text{font-size:14px;margin-bottom:6px;}
+.mq-ans{font-size:13px;}
+.ac{color:var(--success);}
+.aw{color:var(--danger);}
+@media(max-width:700px){.result-grid{grid-template-columns:1fr 1fr;}.result-row.hdr{display:none;}.exam-header{flex-direction:column;gap:8px;}.login-box{width:95%;padding:32px 24px;}}
+</style>
+</head>
+<body>
+
+<div id="loginScreen">
+  <div class="login-box">
+    <div class="login-badge">Onboarding Portal</div>
+    <h1>Exam Login</h1>
+    <p>Enter your details to begin the Software Testing &amp; Development assessment. Duration: 60 minutes.</p>
+    <div class="field"><label>Full Name</label><input type="text" id="empName" placeholder="e.g. Rahul Sharma"/></div>
+    <div class="field"><label>Employee ID</label><input type="text" id="empId" placeholder="e.g. EMP-2024-001"/></div>
+    <div class="field"><label>Department</label><input type="text" id="empDept" placeholder="e.g. QA Engineering"/></div>
+    <button class="btn-primary" onclick="startExam()">Start Exam &#8594;</button>
+    <div class="login-err" id="loginErr">Please fill in all fields.</div>
+    <div class="admin-link">Admin? <span onclick="showAdminLogin()">Login here</span></div>
+  </div>
+</div>
+
+<div id="examScreen">
+  <div class="exam-header">
+    <div class="exam-title">SOFTWARE TESTING &amp; DEVELOPMENT EXAM</div>
+    <div class="timer-wrap"><span class="timer-label">Time Left&nbsp;</span><span id="timerDisplay">60:00</span></div>
+  </div>
+  <div class="progress-bar-wrap"><div class="progress-bar-fill" id="progressBar"></div></div>
+  <div class="exam-body" id="examBody"></div>
+  <div class="submit-wrap">
+    <button class="btn-submit" onclick="submitExam(false)">Submit Exam</button>
+    <div class="unanswered-warn" id="unansWarn"></div>
+  </div>
+</div>
+
+<div id="submittedScreen">
+  <div class="submitted-icon">&#9989;</div>
+  <div class="submitted-title">Exam Submitted Successfully!</div>
+  <div class="submitted-sub" id="submittedMsg"></div>
+</div>
+
+<div id="adminScreen">
+  <div class="admin-header">
+    <div class="admin-title">ADMIN DASHBOARD</div>
+    <div class="admin-badge">CONFIDENTIAL &mdash; INTERNAL ONLY</div>
+  </div>
+  <div class="admin-body">
+    <div class="stats-grid" id="statsGrid"></div>
+    <div class="results-title">Candidate Results</div>
+    <div id="resultsTable"></div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="detailModal">
+  <div class="modal">
+    <div class="modal-hdr">
+      <div style="font-family:var(--mono);font-size:13px;color:var(--accent)">ANSWER DETAIL</div>
+      <button class="modal-close" onclick="closeModal()">&#215;</button>
+    </div>
+    <div id="modalContent"></div>
+  </div>
+</div>
+
+<script>
+var SEC = [
+  {title:"Section A — Software Testing Fundamentals",questions:[
+    {t:"mcq",q:"What is the primary goal of software testing?",o:["To prove software has no bugs","To find defects and ensure software meets requirements","To write test cases","To deploy software faster"],a:1},
+    {t:"mcq",q:"Which testing type verifies individual units of code in isolation?",o:["Integration Testing","System Testing","Unit Testing","Acceptance Testing"],a:2},
+    {t:"mcq",q:"What is a test case?",o:["A defect report","A set of conditions to determine if a system works correctly","A type of bug","A deployment script"],a:1},
+    {t:"mcq",q:"Black-box testing focuses on:",o:["Internal code structure","External behavior without knowledge of internal code","Database testing","Performance testing"],a:1},
+    {t:"mcq",q:"Which is NOT a software testing principle?",o:["Testing shows presence of defects","Exhaustive testing is possible","Early testing saves cost","Defect clustering"],a:1},
+    {t:"mcq",q:"Regression testing is performed to:",o:["Test new features only","Ensure existing functionality is not broken after changes","Test user interfaces","Check load capacity"],a:1},
+    {t:"mcq",q:"What is a test suite?",o:["A collection of test cases","A type of bug tracker","A CI/CD pipeline","A testing framework"],a:0},
+    {t:"scenario",s:"A QA engineer finds that a login button works on Chrome but fails on Firefox. The issue was not caught in earlier testing cycles.",q:"What type of testing should have caught this issue?",o:["Unit Testing","Cross-browser Compatibility Testing","Performance Testing","Security Testing"],a:1},
+    {t:"mcq",q:"Which document defines the scope, approach, resources and schedule of testing activities?",o:["Test Case","Test Plan","Bug Report","Requirements Document"],a:1},
+    {t:"mcq",q:"Severity means impact on the system. Priority means:",o:["Same as severity","Urgency to fix the bug","Number of users affected","Test coverage level"],a:1}
+  ]},
+  {title:"Section B — SDLC and Agile / Scrum",questions:[
+    {t:"mcq",q:"What does SDLC stand for?",o:["Software Development Life Cycle","System Design and Launch Cycle","Software Debugging and Logic Check","Source Data Loading Cycle"],a:0},
+    {t:"mcq",q:"In Agile, a Sprint typically lasts:",o:["1 day","1 to 4 weeks","3 months","6 months"],a:1},
+    {t:"mcq",q:"Who is responsible for prioritizing the Product Backlog in Scrum?",o:["Scrum Master","Developer","Product Owner","QA Lead"],a:2},
+    {t:"mcq",q:"What is the purpose of a Daily Standup?",o:["To write code together","To give status updates and identify blockers","To do code reviews","To deploy features"],a:1},
+    {t:"scenario",s:"Your team just completed a 2-week sprint. The product owner wants to review what was built and provide feedback before the next sprint starts.",q:"Which Scrum ceremony is this?",o:["Sprint Planning","Sprint Retrospective","Sprint Review","Daily Scrum"],a:2},
+    {t:"mcq",q:"In the Waterfall model, testing is performed:",o:["Throughout development","Only after full development is complete","Before requirements are gathered","In parallel with coding"],a:1},
+    {t:"mcq",q:"What is a User Story in Agile?",o:["A bug description","A short description of a feature from the user perspective","A technical specification document","A test plan"],a:1},
+    {t:"mcq",q:"Which Agile metric measures the amount of work completed in a Sprint?",o:["Burn rate","Velocity","Lead time","Defect density"],a:1},
+    {t:"mcq",q:"The Scrum Master primary role is:",o:["Managing the team","Writing code","Facilitating Scrum and removing impediments","Defining product features"],a:2},
+    {t:"scenario",s:"After a sprint, the team discusses what went well, what did not, and how to improve. This meeting focuses on team process, not the product.",q:"Which Scrum ceremony is this?",o:["Sprint Review","Sprint Planning","Sprint Retrospective","Backlog Refinement"],a:2}
+  ]},
+  {title:"Section C — Test Automation",questions:[
+    {t:"mcq",q:"Which tool is widely used for automated web UI testing?",o:["Postman","Selenium","JIRA","Git"],a:1},
+    {t:"mcq",q:"What does CI/CD stand for?",o:["Code Inspection and Code Deployment","Continuous Integration and Continuous Delivery","Central Interface and Central Database","Compile Install and Compile Deploy"],a:1},
+    {t:"mcq",q:"A test automation framework that uses keyword-driven testing is:",o:["Robot Framework","Selenium WebDriver","JUnit","TestNG"],a:0},
+    {t:"scenario",s:"A development team pushes code 10 times a day. Manually running 500 regression tests each time is not feasible. The QA lead proposes automating regression tests and integrating them into the pipeline.",q:"What is the PRIMARY benefit of this approach?",o:["Reduces need for manual testers entirely","Provides fast feedback on every code change","Replaces the need for a test plan","Eliminates all bugs automatically"],a:1},
+    {t:"mcq",q:"Which type of test is MOST suitable for automation?",o:["Exploratory testing","Usability testing","Repetitive regression tests","Ad-hoc testing"],a:2},
+    {t:"mcq",q:"In Selenium, which method locates an element by its ID?",o:["findElement(By.name())","findElement(By.id())","findElement(By.css())","locateById()"],a:1},
+    {t:"mcq",q:"What is a Page Object Model (POM) in test automation?",o:["A model to track pages in a document","A design pattern creating object representations of web pages","A Jira workflow","A type of test case"],a:1},
+    {t:"mcq",q:"TestNG and JUnit are primarily used for:",o:["Performance testing","API testing","Unit and integration test automation in Java","UI automation"],a:2},
+    {t:"scenario",s:"An automation script passes locally but fails consistently in the CI pipeline with a NoSuchElementException error.",q:"What is the MOST likely cause?",o:["The test is wrong","Element load timing issue requiring better wait strategies","The CI server is broken","The test should be deleted"],a:1},
+    {t:"mcq",q:"What is a flaky test?",o:["A test that always passes","A test that sometimes passes and sometimes fails without code changes","A test that is very fast","A test covering many features"],a:1}
+  ]},
+  {title:"Section D — Bug Tracking and Tools",questions:[
+    {t:"mcq",q:"Which tool is most commonly used for bug tracking in Agile teams?",o:["Selenium","Postman","JIRA","GitHub"],a:2},
+    {t:"mcq",q:"What should a good bug report include?",o:["Only the error screenshot","Steps to reproduce, expected result, actual result, severity, environment","Just the error message","The developer name"],a:1},
+    {t:"mcq",q:"A bug with Severity High and Priority Low means:",o:["It should be fixed immediately","It causes significant impact but is not urgent to fix right now","It is a minor cosmetic issue","It should be closed"],a:1},
+    {t:"scenario",s:"A tester finds the application crashes when uploading files larger than 10MB. Large file uploads are rare in the business environment.",q:"How would you classify this bug?",o:["Severity Low, Priority Low","Severity High, Priority Low","Severity Low, Priority High","Severity High, Priority High"],a:1},
+    {t:"mcq",q:"Which bug status means the fix is ready for QA to verify?",o:["Open","In Progress","Resolved / Fixed","Closed"],a:2},
+    {t:"mcq",q:"What is test coverage?",o:["The number of testers on a project","The percentage of code or requirements covered by tests","The time taken to run all tests","The number of test cases written"],a:1},
+    {t:"mcq",q:"In version control, what does git commit do?",o:["Pushes code to remote repository","Saves changes to local repository with a message","Merges two branches","Deletes a file"],a:1},
+    {t:"mcq",q:"What is the purpose of a defect lifecycle?",o:["To track stages a bug goes through from discovery to closure","To measure developer performance","To plan sprint capacity","To define test cases"],a:0}
+  ]},
+  {title:"Section E — API Testing",questions:[
+    {t:"mcq",q:"What does API stand for?",o:["Application Process Integration","Application Programming Interface","Automated Program Inspector","Applied Process Interface"],a:1},
+    {t:"mcq",q:"Which HTTP method is used to CREATE a new resource?",o:["GET","PUT","POST","DELETE"],a:2},
+    {t:"mcq",q:"A REST API returns status code 404. What does this mean?",o:["Success","Server Error","Resource Not Found","Unauthorized"],a:2},
+    {t:"mcq",q:"Which tool is most popular for manual API testing?",o:["Selenium","JIRA","Postman","Jenkins"],a:2},
+    {t:"scenario",s:"You send a POST request with a valid payload. The API returns 200 OK but the user is not created in the database and the response says status success.",q:"What is the BEST next step?",o:["Accept the result as 200 means success","Investigate: response and DB state contradict each other, likely a backend bug","Change the HTTP method to GET","Check your internet connection"],a:1},
+    {t:"mcq",q:"What is JSON?",o:["A programming language","A lightweight data-interchange format","A database","A testing framework"],a:1},
+    {t:"mcq",q:"Which HTTP status code indicates a successful response?",o:["404","500","200","301"],a:2}
+  ]},
+  {title:"Section F — Security Testing",questions:[
+    {t:"mcq",q:"What is SQL Injection?",o:["A way to speed up database queries","An attack where malicious SQL code is inserted into input fields to manipulate the database","A type of performance test","A code review technique"],a:1},
+    {t:"mcq",q:"XSS stands for:",o:["External Style Sheet","Cross-Site Scripting","Extra Server Security","Extended Software Suite"],a:1},
+    {t:"mcq",q:"What is the purpose of penetration testing?",o:["To test how many users can use the system simultaneously","To simulate an attack and find vulnerabilities before real attackers do","To check UI design","To test API endpoints"],a:1},
+    {t:"scenario",s:"A web application has a search box. A tester enters a script tag with an alert command and an alert box pops up on the screen.",q:"What vulnerability has been discovered?",o:["SQL Injection","CSRF Attack","Cross-Site Scripting XSS","Buffer Overflow"],a:2},
+    {t:"mcq",q:"What does OWASP stand for?",o:["Online Web Application Security Protocol","Open Web Application Security Project","Official Web Audit and Security Platform","Open-source Web App Software Package"],a:1},
+    {t:"mcq",q:"Best practice to prevent SQL injection:",o:["Using longer passwords","Using parameterized queries and prepared statements","Disabling the database","Allowing only admin logins"],a:1},
+    {t:"mcq",q:"Authentication verifies WHO you are. Authorization verifies:",o:["Your password strength","WHAT you are allowed to do","Your session token","Your IP address"],a:1}
+  ]}
+];
+
+var ALL = [];
+for(var si=0;si<SEC.length;si++){for(var qi=0;qi<SEC[si].questions.length;qi++){var q=SEC[si].questions[qi];ALL.push({t:q.t,q:q.q,o:q.o,a:q.a,s:q.s||null,si:si});}}
+
+var ans={}, submitted=false, warnedOnce=false;
+var linkOpenedAt=new Date().toISOString(), examStartedAt=null;
+var empName='',empId='',empDept='';
+var secsLeft=3600, timerInt=null;
+var SKEY='examRes_v3', APASS='Admin@123';
+var SHEET_URL='https://script.google.com/macros/s/AKfycbzJ-QW8iX6fXzXFQjhXP7o8u-QYJFlnIFcnKrMw8cVDJKv3s7Nezn2djyRG9nYz7O4K/exec';
+
+function getRes(){try{return JSON.parse(localStorage.getItem(SKEY)||'[]');}catch(e){return[];}}
+function saveRes(r){
+  var a=getRes();a.push(r);localStorage.setItem(SKEY,JSON.stringify(a));
+  // Send to Google Sheets
+  try{
+    fetch(SHEET_URL,{
+      method:'POST',
+      headers:{'Content-Type':'text/plain'},
+      body:JSON.stringify(r)
+    }).catch(function(e){console.log('Sheet sync error:',e);});
+  }catch(e){console.log('Sheet error:',e);}
+}
+
+function startExam(){
+  var n=document.getElementById('empName').value.trim();
+  var i=document.getElementById('empId').value.trim();
+  var d=document.getElementById('empDept').value.trim();
+  if(!n||!i||!d){document.getElementById('loginErr').style.display='block';return;}
+  empName=n;empId=i;empDept=d;
+  examStartedAt=new Date().toISOString();
+  document.getElementById('loginScreen').style.display='none';
+  document.getElementById('examScreen').style.display='block';
+  buildExam();
+  runTimer();
+}
+
+function runTimer(){
+  var el=document.getElementById('timerDisplay');
+  timerInt=setInterval(function(){
+    secsLeft--;
+    var m=Math.floor(secsLeft/60),s=secsLeft%60;
+    el.textContent=(m<10?'0':'')+m+':'+(s<10?'0':'')+s;
+    if(secsLeft<=300&&secsLeft>60)el.className='warn';
+    else if(secsLeft<=60)el.className='danger';
+    document.getElementById('progressBar').style.width=Math.round(Object.keys(ans).length/ALL.length*100)+'%';
+    if(secsLeft<=0){clearInterval(timerInt);submitExam(true);}
+  },1000);
+}
+
+function buildExam(){
+  var body=document.getElementById('examBody');
+  body.innerHTML='';
+  var lastSi=-1;
+  var K=['A','B','C','D'];
+  for(var gi=0;gi<ALL.length;gi++){
+    var q=ALL[gi];
+    if(q.si!==lastSi){
+      var st=document.createElement('div');
+      st.className='section-title';
+      st.textContent=SEC[q.si].title;
+      body.appendChild(st);
+      lastSi=q.si;
+    }
+    var card=document.createElement('div');
+    card.className='q-card';
+    card.id='q'+gi;
+    var h='<div class="q-num">Q'+(gi+1)+' of '+ALL.length+'&nbsp; &bull; &nbsp;'+(q.t==='scenario'?'Scenario-Based':'Multiple Choice')+'</div>';
+    if(q.t==='scenario'&&q.s){h+='<div class="q-scenario">'+q.s+'</div>';}
+    h+='<div class="q-text">'+q.q+'</div><div class="options">';
+    for(var oi=0;oi<q.o.length;oi++){
+      h+='<div class="opt-label" id="o_'+gi+'_'+oi+'" onclick="pick('+gi+','+oi+')">';
+      h+='<span class="opt-key">'+K[oi]+'</span><span>'+q.o[oi]+'</span></div>';
+    }
+    h+='</div>';
+    card.innerHTML=h;
+    body.appendChild(card);
+  }
+}
+
+function pick(gi,oi){
+  for(var i=0;i<ALL[gi].o.length;i++){var e=document.getElementById('o_'+gi+'_'+i);if(e)e.classList.remove('selected');}
+  var sel=document.getElementById('o_'+gi+'_'+oi);if(sel)sel.classList.add('selected');
+  ans[gi]=oi;
+}
+
+function submitExam(auto){
+  if(submitted)return;
+  var unans=ALL.length-Object.keys(ans).length;
+  if(!auto&&unans>0&&!warnedOnce){
+    warnedOnce=true;
+    var w=document.getElementById('unansWarn');
+    w.textContent=unans+' question(s) unanswered. Click Submit again to confirm.';
+    w.style.display='block';
+    return;
+  }
+  submitted=true;
+  clearInterval(timerInt);
+  var now=new Date();
+  var timeTaken=Math.round((now.getTime()-new Date(examStartedAt).getTime())/1000);
+  var correct=0;
+  for(var i=0;i<ALL.length;i++){if(ans[i]===ALL[i].a)correct++;}
+  var pct=Math.round(correct/ALL.length*100);
+  saveRes({id:now.getTime(),name:empName,empId:empId,dept:empDept,linkOpenedAt:linkOpenedAt,examStartedAt:examStartedAt,examSubmittedAt:now.toISOString(),timeTakenSecs:timeTaken,score:correct,total:ALL.length,pct:pct,answers:JSON.parse(JSON.stringify(ans))});
+  document.getElementById('examScreen').style.display='none';
+  document.getElementById('submittedScreen').style.display='flex';
+  document.getElementById('submittedMsg').textContent='Thank you, '+empName+'! Your exam was submitted on '+now.toLocaleString()+'. Results will be communicated by your HR or Project team.';
+}
+
+function showAdminLogin(){var p=prompt('Enter Admin Password:');if(p===APASS)showAdmin();else if(p!==null)alert('Incorrect password.');}
+
+function showAdmin(){
+  ['loginScreen','examScreen','submittedScreen'].forEach(function(id){document.getElementById(id).style.display='none';});
+  document.getElementById('adminScreen').style.display='block';
+  renderAdmin();
+}
+
+function ft(secs){if(!secs&&secs!==0)return '--';return Math.floor(secs/60)+'m '+(secs%60)+'s';}
+function fdt(iso){if(!iso)return '--';try{var d=new Date(iso);return d.toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'})+' '+d.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'});}catch(e){return iso;}}
+function esc(s){if(!s)return '';return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+
+function renderAdmin(){
+  var res=getRes();
+  var total=res.length,avg=0,passed=0,avgT=0;
+  if(total){for(var i=0;i<res.length;i++){avg+=res[i].pct;avgT+=res[i].timeTakenSecs||0;if(res[i].pct>=60)passed++;}avg=Math.round(avg/total);avgT=Math.round(avgT/total);}
+  document.getElementById('statsGrid').innerHTML=
+    '<div class="stat-card"><div class="stat-label">Total Candidates</div><div class="stat-val">'+total+'</div><div class="stat-sub">Exam submissions</div></div>'+
+    '<div class="stat-card"><div class="stat-label">Pass Rate</div><div class="stat-val">'+(total?Math.round(passed/total*100):0)+'%</div><div class="stat-sub">'+passed+' of '+total+' passed (60%+)</div></div>'+
+    '<div class="stat-card"><div class="stat-label">Avg Score</div><div class="stat-val">'+avg+'%</div><div class="stat-sub">Across all candidates</div></div>'+
+    '<div class="stat-card"><div class="stat-label">Avg Time</div><div class="stat-val">'+ft(avgT)+'</div><div class="stat-sub">To complete exam</div></div>';
+  if(!total){document.getElementById('resultsTable').innerHTML='<div class="no-res">No submissions yet.</div>';return;}
+  var html='<div class="result-row hdr"><div class="result-grid"><div>Candidate</div><div>Score</div><div>Link Opened</div><div>Exam Started</div><div>Time Taken</div><div>Detail</div></div></div>';
+  var rev=res.slice().reverse();
+  for(var j=0;j<rev.length;j++){
+    var r=rev[j];
+    var pc=r.pct>=70?'sp':r.pct>=50?'sa':'sf';
+    html+='<div class="result-row"><div class="result-grid">'+
+      '<div><div class="result-name">'+esc(r.name)+'</div><div class="result-detail">'+esc(r.empId)+' &middot; '+esc(r.dept)+'</div></div>'+
+      '<div><span class="score-pill '+pc+'">'+r.score+'/'+r.total+' ('+r.pct+'%)</span></div>'+
+      '<div class="result-detail">'+fdt(r.linkOpenedAt)+'</div>'+
+      '<div class="result-detail">'+fdt(r.examStartedAt)+'</div>'+
+      '<div class="result-detail">'+ft(r.timeTakenSecs)+'</div>'+
+      '<div><button class="btn-detail" onclick="showDetail('+r.id+')">View</button></div>'+
+      '</div></div>';
+  }
+  document.getElementById('resultsTable').innerHTML=html;
+}
+
+function showDetail(id){
+  var res=getResults?getRes():getRes();
+  var r=null;for(var i=0;i<res.length;i++){if(res[i].id===id){r=res[i];break;}}
+  if(!r)return;
+  var K=['A','B','C','D'];
+  var html='<div style="margin-bottom:20px;"><div style="font-size:18px;font-weight:700;margin-bottom:4px;">'+esc(r.name)+'</div>'+
+    '<div style="color:var(--muted);font-size:13px;">'+esc(r.empId)+' &middot; '+esc(r.dept)+'</div>'+
+    '<div style="margin-top:12px;display:flex;gap:16px;flex-wrap:wrap;font-size:14px;">'+
+    '<span>Score: <b style="color:var(--accent)">'+r.score+'/'+r.total+' ('+r.pct+'%)</b></span>'+
+    '<span>Time Taken: <b>'+ft(r.timeTakenSecs)+'</b></span>'+
+    '<span>Submitted: <b>'+fdt(r.examSubmittedAt)+'</b></span>'+
+    '<span>Link Opened: <b>'+fdt(r.linkOpenedAt)+'</b></span>'+
+    '</div></div><hr style="border-color:var(--border);margin-bottom:20px;">';
+  for(var qi=0;qi<ALL.length;qi++){
+    var q=ALL[qi];
+    var given=r.answers[qi];
+    var correct=q.a;
+    var astr='';
+    if(given===undefined||given===null){astr='<span style="color:var(--muted)">Not answered</span>';}
+    else if(given===correct){astr='<span class="ac">'+K[given]+': '+esc(q.o[given])+' &#10003;</span>';}
+    else{astr='<span class="aw">'+K[given]+': '+esc(q.o[given])+' &#10007;</span> &nbsp;|&nbsp; Correct: <span class="ac">'+K[correct]+': '+esc(q.o[correct])+'</span>';}
+    html+='<div class="mq"><div class="mq-text"><b>Q'+(qi+1)+'.</b> '+esc(q.q)+'</div><div class="mq-ans">'+astr+'</div></div>';
+  }
+  document.getElementById('modalContent').innerHTML=html;
+  document.getElementById('detailModal').classList.add('open');
+}
+
+function closeModal(){document.getElementById('detailModal').classList.remove('open');}
+document.getElementById('detailModal').addEventListener('click',function(e){if(e.target===this)closeModal();});
+</script>
+</body>
+</html>
